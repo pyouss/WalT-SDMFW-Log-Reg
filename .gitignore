@@ -6,3 +6,7 @@
 */__pycache__/*
 __pycache__/*
 config/*
+utils/__pycache__/*
+dataset/*
+regrets/*
+graphs/*

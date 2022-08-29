@@ -7,10 +7,27 @@ if [[ $1 == "help" ]];then
     exit 1
 fi
 
+if [[ $1 == "u" ]];then
+    if [[ $3 == "s" ]];then
+        trash=$(python3 utils/p_config.py u $2)
+        trash=$(python3 utils/p_config.py s $4)
+        less config/envi.conf
+    else
+        echo "Error of arguments"
+        exit 1
+    fi
+fi
 
 folder=("graphs" "dataset" "config" "result" "tmp" "node_program")
 
+ssh -q $user@$server exit
+connection_failed=$?
+if [[ $connection_failed != 0 ]];then
+    echo "connection failed! Incorrect username or server"
+    exit 1
+fi
 
+exit 1
 for i in ${folder[*]}
 do
 	ssh $user@$server mkdir ${i} 2> /dev/null
@@ -29,5 +46,6 @@ create_dir "regrets"
 
 create_dir "optimals"
 
+create_dir "graphs"
 
 echo "Set up is ready to use."

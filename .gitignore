@@ -1,3 +1,4 @@
 *.csv
 *.png
-config/envi.conf
+*.conf
+*__pycache__*

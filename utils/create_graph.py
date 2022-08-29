@@ -10,6 +10,7 @@ graph_config = ConfigParser()
 graph_config.read("config/graph.conf")
 param_config = ConfigParser()
 param_config.read("config/param.conf")
+local_graph_config = ConfigParser()
 
 graph_type = graph_config["GRAPHTYPE"]
 
@@ -22,24 +23,24 @@ nb_nodes = 0
 
 def complete_graph():
 	global nb_nodes
-	n = int(graph_param["n"])
-	nb_nodes = n
-	return np.ones((n,n)) - np.diag(np.ones(n)) 
+	n0 = int(graph_param["n0"])
+	nb_nodes = n0
+	return np.ones((n0,n0)) - np.diag(np.ones(n0)) 
 
 def grid_graph():
 	global nb_nodes
-	n = int(graph_param["n"])
-	m = int(graph_param["m"])
-	nb_nodes = n*m
+	n0 = int(graph_param["n0"])
+	n1 = int(graph_param["n1"])
+	nb_nodes = n0*n1
 	res = np.zeros((nb_nodes, nb_nodes))
 	for i in range(nb_nodes-1):
-		if i % m == m-1:
-		    res[i,i+m] = 1
-		elif i >= (n-1)*m:
+		if i % n1 == n1-1:
+		    res[i,i+n1] = 1
+		elif i >= (n0-1)*n1:
 		    res[i,i+1] = 1
 		else:
 		    res[i,i+1] = 1
-		    res[i,i+m] = 1
+		    res[i,i+n1] = 1
 	for i in range(nb_nodes):
 		for j in range(i):
 		    res[i,j] = res[j,i]
@@ -47,38 +48,39 @@ def grid_graph():
 
 def line_graph():
 	global nb_nodes
-	n = int(graph_param["n"])
-	nb_nodes = n
-	i = list(range(1,n))+list(range(n-1)) 
-	j = list(range(n-1))+list(range(1,n))
-	res = np.zeros((n,n))
+	n0 = int(graph_param["n0"])
+	nb_nodes = n0
+	i = list(range(1,n0))+list(range(n0-1)) 
+	j = list(range(n0-1))+list(range(1,n0))
+	res = np.zeros((n0,n0))
 	res[i,j] = 1
 	return res
 
 def cycle_graph():
 	global nb_nodes
-	n = int(graph_param["n"])
-	nb_nodes = n
+	n0 = int(graph_param["n0"])
+	nb_nodes = n0
 	res = np.zeros((nb_nodes, nb_nodes))
 	res[0, 1] = 1
-	res[0, n-1] = 1
-	res[n-1, n-2] = 1
-	res[n-1, 0] = 1
-	for i in range(1, n-1):
+	res[0, n0-1] = 1
+	res[n0-1, n0-2] = 1
+	res[n0-1, 0] = 1
+	for i in range(1, n0-1):
 		res[i, i-1] = 1
 		res[i, i+1] = 1
 	return res
 
 def create_local_graph_conf(G,i):
-	s = "[MYID]"+"\n"+"my_id = "
-	n = G.shape[0]
-	s = s + str(i)+"\n\n"+"[NEIGHBORS]"+"\n"+"neighbors = "
-	for j in range(n):
+	n0 = int(graph_param["n0"])
+	s = ""
+	for j in range(n0):
 		if(G[i,j] == 1):
 			s += str(j)
 			s += ","
 	s = s[:-1]
-	return s
+	local_graph_config["MYID"] = {"my_id" : str(i)}
+	local_graph_config["NEIGHBORS"] = {"neighbors" : s}
+	local_graph_config.write(open("graphs/node_"+str(i)+".conf", 'w'))
 
 
 graph_function_name = {"complete" : complete_graph, "grid": grid_graph, "line": line_graph, "cycle": cycle_graph}
@@ -91,7 +93,4 @@ if __name__ == "__main__":
 		shutil.rmtree("./graphs")
 	os.mkdir("./graphs")
 	for i in range(nb_nodes):
-		graph = create_local_graph_conf(G,i)
-		graph_name = "graphs/node_"+str(i)+".conf"
-		with open(graph_name, 'w') as f:   
-			f.write(graph)                
+		graph = create_local_graph_conf(G,i)               

@@ -8,7 +8,7 @@ import pandas as pd
 from scipy.special import softmax
 from configparser import ConfigParser
 
-
+start = time.time()
 
 np.set_printoptions(threshold = np.inf) 
 np.set_printoptions(suppress = True)
@@ -38,9 +38,9 @@ for neighbor in my_neighbors:
     received_msg.append(0)
     my_neighbors_degree[neighbor] = -1
     my_degree += 1
-received_msg_y = np.array(received_msg, dtype='int32')
-received_msg_d = np.array(received_msg, dtype='int32')
+received_msg = np.array(received_msg, dtype='int32')
 my_degree = len(neighborhood_ids)
+print(f"{my_id=} {my_degree=} {my_neighbors=} {my_neighbors_degree=} {neighborhood_ids=}")
 
 #Read config file
 config_object = ConfigParser()
@@ -61,7 +61,8 @@ num_nodes = int(algoinfo["num_nodes"])
 r = float(algoinfo["r"])
 eta = float(algoinfo["eta"])
 eta_exp = float(algoinfo["eta_exp"])
-reg = float(algoinfo["reg_coef"])
+rho = float(algoinfo["rho"])
+rho_exp = float(algoinfo["rho_exp"])
 
 dim = (f,c) # dimension of the output and messages
 shape = (f,c)
@@ -81,12 +82,13 @@ n = batch_size
 local_batch_size = int(batch_size/num_nodes)
 eta_l = 0
 
-neighborhood_y = []
-neighborhood_d = []
-
+neighborhood = []
 
 
 def mux_degree(n_id, d):
+	if d == None:
+		print("I got degree wrong")
+		return
 	my_neighbors_degree[n_id] = d
 
 
@@ -97,74 +99,46 @@ def should_demux_degree():
 	return True
 
 def demux_degree():
+	print(my_neighbors_degree,my_degree)
 	for i in my_neighbors_degree:
 		weight[neighborhood_ids[i]] = 1.0/(1 + max(int(my_degree), int(my_neighbors_degree[i])))
 	weight[-1] = 1.0 - np.sum(weight)
-	return weight
 
 
-def mux_y(n_id,v):
-	global weight
-	global neighborhood_y
-	global received_msg_y
+def mux(n_id,v):
+	if v.any() == None:
+		print("I got something wrong")
+		return
 	v_id = neighborhood_ids[n_id]
-	count = received_msg_y[v_id]
-	if count >= len(neighborhood_y):
-		neighborhood_y.append(np.zeros(dim))
-	neighborhood_y[count] = neighborhood_y[count] + v * weight[v_id]
-	received_msg_y[v_id] += 1
+	count = received_msg[v_id]
+	if count >= len(neighborhood):
+		neighborhood.append(np.zeros(dim))
+	neighborhood[count] = neighborhood[count] + v * weight[v_id]
+	received_msg[v_id] += 1
 
-def should_demux_y():
-	global received_msg_y
-	for i in received_msg_y:
+def should_demux():
+	for i in received_msg:
 		if i == 0:
 			return False
 	return True
 
-def demux_y():
-	global neighborhood_y
-	global received_msg_y
-	res = neighborhood_y[0]
-	neighborhood_y = neighborhood_y[1:]
-	received_msg_y = received_msg_y - np.ones(my_degree,dtype='int32')
-	return res
-
-def mux_d(n_id,v):
-	global weight
-	global neighborhood_d
-	global received_msg_d
-	v_id = neighborhood_ids[n_id]
-	count = received_msg_d[v_id]
-	if count >= len(neighborhood_d):
-		neighborhood_d.append(np.zeros(dim))
-	neighborhood_d[count] = neighborhood_d[count] + v * weight[v_id]
-	received_msg_d[v_id] += 1
-
-def should_demux_d():
-	global received_msg_d
-	for i in received_msg_d:
-		if i == 0:
-			return False
-	return True
-
-def demux_d():
-	global neighborhood_d
-	global received_msg_d
-	res = neighborhood_d[0]
-	neighborhood_d = neighborhood_d[1:]
-	received_msg_d = received_msg_d - np.ones(my_degree,dtype='int32')
+def demux():
+	global neighborhood
+	global received_msg
+	res = neighborhood[0]
+	neighborhood = neighborhood[1:]
+	received_msg = received_msg - np.ones(my_degree,dtype='int32')
 	return res
 
 def send_degree(n, deg, channel):
 	msg = {
-		'tag' : 'degree',
 		'id' : my_id,
 		'degree' : str(deg),
 	}
 	channel.basic_publish(
 		exchange = n,
 		routing_key = n + '.notify',
-		body = json.dumps({'tag':msg['tag'],'degree':msg['degree'], 'id': my_id}),
+		body = json.dumps({'degree':msg['degree'], 'id': my_id}),
 			mandatory=True
 			)
 		
@@ -174,6 +148,7 @@ def degree(ch, method, properties, body):
 	payload = json.loads(body)
 	deg = payload.get('degree')
 	n_id = payload.get('id')
+	print("received degree",deg,n_id)
 	mux_degree(n_id,deg)
 	if should_demux_degree() :
 		ch.basic_ack(delivery_tag = method.delivery_tag)
@@ -193,10 +168,9 @@ def sparse_list_definition(M):
 	return I, J, values
 
 
-def send_message(n, message,tag, channel):
+def send_message(n, message, channel):
 	message_I,message_J,message_value = sparse_list_definition(message) 
 	msg = {
-		'tag' : tag,
 		'id' : my_id,
 		'msg_I' : message_I,
 		'msg_J' : message_J,
@@ -205,75 +179,60 @@ def send_message(n, message,tag, channel):
 	channel.basic_publish(
 		exchange = n,
 		routing_key = n + '.notify',
-		body = json.dumps({'tag' : msg['tag'],
-			'msg_I' : msg['msg_I'], 
+		body = json.dumps({'msg_I' : msg['msg_I'], 
 			'msg_J' : msg['msg_J'] , 
 			'msg_values' : msg['msg_values'] ,
 			'id' : my_id}),
 			mandatory = True
 	)
 
-def send_message_to_neighbours(msg,tag):
+def send_message_to_neighbours(msg):
 	for i in neighborhood_ids:
-		send_message(i,msg,tag,channel)
+		send_message(i,msg,channel)
 
-def callback(ch,method,properties,body):
+
+def callback_update_fed_y(ch, method, properties, body):
+	global y
 	payload = json.loads(body)
-	global weight
-	if payload.get('tag')=='degree': 
-		payload = json.loads(body)
-		deg = payload.get('degree')
-		n_id = payload.get('id')
-		mux_degree(n_id,deg)
-		if should_demux_degree() :
-			ch.basic_ack(delivery_tag = method.delivery_tag)
-			channel.stop_consuming()
-			print(f" ----- before demux_degree {weight=} {payload=}")
-			weight = demux_degree()
-			print(f" ----- after demux_degree {weight=}")
-			return
+	rec_I =  payload.get('msg_I')
+	rec_J = payload.get('msg_J')
+	rec_values = payload.get('msg_values')
+	rec = np.zeros(shape)
+	rec[rec_I,rec_J] = rec_values	
+	n_id = payload.get('id')
+	mux(n_id,rec)
+	if should_demux() :
+		y = demux() + x * weight[-1]
 		ch.basic_ack(delivery_tag = method.delivery_tag)
-	elif payload.get('tag')=='y_vector':
-		global y
-		payload = json.loads(body)
-		rec_I =  payload.get('msg_I')
-		rec_J = payload.get('msg_J')
-		rec_values = payload.get('msg_values')
-		rec = np.zeros(shape)
-		rec[rec_I,rec_J] = rec_values	
-		n_id = payload.get('id')
-		mux_y(n_id,rec)
-		if should_demux_y() :
-			y = demux_y() + x * weight[-1]
-			ch.basic_ack(delivery_tag = method.delivery_tag)
-			channel.stop_consuming()
-			return
+		channel.stop_consuming()
+		return
+	ch.basic_ack(delivery_tag = method.delivery_tag)
+
+def callback_update_fed_d(ch, method, properties, body):
+	global d
+	payload = json.loads(body)
+	rec_I =  payload.get('msg_I')
+	rec_J = payload.get('msg_J')
+	rec_values = payload.get('msg_values')
+	rec = np.zeros(shape)
+	rec[rec_I,rec_J] = rec_values
+	n_id = format(payload['id'])
+	mux(n_id,rec)
+
+	if should_demux() :
+		d = demux() +  g * weight[-1]
 		ch.basic_ack(delivery_tag = method.delivery_tag)
-	elif payload.get('tag')=='d_vector':
-		global d
-		payload = json.loads(body)
-		rec_I =  payload.get('msg_I')
-		rec_J = payload.get('msg_J')
-		rec_values = payload.get('msg_values')
-		rec = np.zeros(shape)
-		rec[rec_I,rec_J] = rec_values
-		n_id = format(payload['id'])
-		mux_d(n_id,rec)
-		if should_demux_d() :
-			d = demux_d() +  g * weight[-1]
-			ch.basic_ack(delivery_tag = method.delivery_tag)
-			channel.stop_consuming()
-			return
-		ch.basic_ack(delivery_tag = method.delivery_tag)
-		
+		channel.stop_consuming()
+		return
+	ch.basic_ack(delivery_tag = method.delivery_tag)
 
 def update_y():
-	channel.basic_consume(on_message_callback = callback, queue=my_id+'_notify')	
+	channel.basic_consume(on_message_callback = callback_update_fed_y, queue=my_id+'_notify')	
 	channel.start_consuming()
 	channel.stop_consuming()
 
 def update_d():
-	channel.basic_consume(on_message_callback = callback, queue=my_id+'_notify')	
+	channel.basic_consume(on_message_callback = callback_update_fed_d, queue=my_id+'_notify')	
 	channel.start_consuming()
 	channel.stop_consuming()
 
@@ -299,8 +258,9 @@ def lmo(o):
 def degree_exchange():
 	msg = len(neighborhood_ids)
 	for i in neighborhood_ids:
+		print(f"{my_id=} ->  {i=} :  {msg=}")
 		send_degree(i,msg,channel)
-	channel.basic_consume(on_message_callback = callback, queue=my_id+'_notify')
+	channel.basic_consume(on_message_callback = degree, queue=my_id+'_notify')
 	channel.start_consuming()
 	channel.stop_consuming()
 
@@ -324,7 +284,7 @@ def receive_batch_old(t):
 
 
 def noise(o):
-	global reg
+	reg = 20 
 	noise = -0.5 + np.random.rand(shape[0],shape[1])
 	return reg * o + noise
 
@@ -339,63 +299,47 @@ def DMFW():
 	global y_data
 	result = []
 	xs = [np.zeros(dim) for _ in range(L+1)]
-	time_of_round = 0
-	time_of_iteration = 0 
-	time_of_comm = 0
-	time_of_update = 0
-	time_of_data = 0
+
 	for t in range(T):
-		time_of_round -= time.time()
 		x = np.zeros(shape)
 		xs[0] = np.zeros(shape)
 		for l in range(L):
-			time_of_iteration -= time.time()
 			eta_l = min(eta / pow(l+1, eta_exp), 1.0)
 			v = lmo(noise(o[l]))
-			time_of_comm -= time.time()
-			send_message_to_neighbours(xs[l],'y_vector')
+			send_message_to_neighbours(xs[l])
 			update_y()
-			time_of_comm += time.time()
 			xs[l+1] = y + eta_l * (v - y)
 			x = xs[l+1]
-			time_of_iteration += time.time()
-		time_of_round += time.time()
-		time_of_data -= time.time() 
+			print(f"{t=} {l=} x updates")
+
 		x_data, y_data = receive_batch(t)
 		result.append(xs[L].reshape(f*c))
-		time_of_data += time.time()
 
 		g = compute_gradient(xs[0])
 		h = g
 		for l in range(L):
-			send_message_to_neighbours(g,'d_vector')
+			#rho_l = pow((2/(l+1)),(2/3)),
+			send_message_to_neighbours(g)
 			update_d()
+			#a = rho_l * (d - a) + a 
 			tmp = compute_gradient(xs[l+1])
 			g = (tmp - h) + d
 			h = tmp
 			o[l+1] = o[l] + d
-	time_of_round = time_of_round / T 
-	time_of_data = time_of_data / T
-	time_of_comm = time_of_comm	/ (T*L)
-	time_of_iteration = time_of_iteration / (T*L)
-	
-	print(f"{time_of_round=}\t{time_of_data=}\t{time_of_comm=}\t{time_of_iteration=}")
+			print(f"{t=} {l=} g updates")
 	pd.DataFrame(result).to_csv("/persist/result.csv", index=False, header = False)
+	print("ok")
+
 if (os.path.exists("/persist/result.csv")) :
 	os.remove("/persist/result.csv")
 
 degree_exchange()
 
-
-
-start = time.time()
-
 DMFW()
 
-end = time.time()
 print("node_"+str(my_id)+" done !")
 
 
-
+end = time.time()
 print("Time taken: " + str(end - start)+ "s")
 exit()

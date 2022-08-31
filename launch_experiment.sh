@@ -9,6 +9,7 @@ if [[ $1 == "help" ]];then
 fi
 
 if [[ $1 == "-t" ]];then
+    rm .*.log 2> /dev/null
     for((i=0;i<$num_nodes;i++));  
     do
         name="node"${i}
@@ -38,7 +39,7 @@ if [[ $1 == "-t" ]];then
         fi
     done
 fi
-  
+
 
 echo "Running experiment"
 
@@ -47,10 +48,10 @@ do
     name="node_"${i}
     node=$(get_config NODEINFO $name $node_list_path)
     echo "Launch ${node}"
-    echo y | ssh $user@$server walt node run ${node} python3 node.py &    
+    echo y | ssh $user@$server walt node run ${node} python3 node.py > .${node}.log &
 done
 
 
-wait 
+wait
 echo "Done."
 echo "-------------------------------------"

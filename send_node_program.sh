@@ -16,7 +16,7 @@ num_nodes=$(get_config ALGOCONFIG num_nodes $local_config_param)
 
 if [ $# -eq 0 ]
 then
-    scp node_program/node.py $user@$server:node_program/node.py
+    scp node_program/test.py $user@$server:node_program/node.py
 
     for((i=0;i<$num_nodes;i++));
     do

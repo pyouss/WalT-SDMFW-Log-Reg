@@ -1,4 +1,3 @@
-
 #!/bin/bash 
 source ./utils/read_config_files.sh
 source ./utils/pretyprint.sh
@@ -18,20 +17,20 @@ graph_name=$(get_config GRAPHTYPE type $local_config_graph)
 function compute_nb_nodes(){
     if [ "$graph_name" = "COMPLETE" ]
     then
-        n=$(get_config COMPLETEPARAM n $local_config_graph)
+        n=$(get_config COMPLETEPARAM n0 $local_config_graph)
         echo $n
     elif [ "$graph_name" = "GRID" ]
     then
-        n=$(get_config GRIDPARAM n $local_config_graph)
-        m=$(get_config GRIDPARAM m $local_config_graph)
+        n=$(get_config GRIDPARAM n0 $local_config_graph)
+        m=$(get_config GRIDPARAM n1 $local_config_graph)
         echo $[$n * $m]
     elif [ "$graph_name" = "LINE" ]     
     then
-        n=$(get_config LINEPARAM n $local_config_graph)
+        n=$(get_config LINEPARAM n0 $local_config_graph)
         echo $n
     elif [ "$graph_name" = "CYCLE" ]     
     then
-        n=$(get_config CYCLEPARAM n $local_config_graph)
+        n=$(get_config CYCLEPARAM n0 $local_config_graph)
         echo $n
     else
         echo "Error type"
@@ -43,8 +42,7 @@ then
     nb_nodes=$(compute_nb_nodes)
 
 
-    if [ $nb_nodes != $num_nodes ]
-    then
+    if [[ $nb_nodes != $num_nodes ]];then
         echo "Error, num_nodes doesn't equal to total number of nodes"
         exit 1
     fi
@@ -72,6 +70,7 @@ then
     echo "Transfering number of nodes to rabbitmq node. ${node}"
     ssh $user@$server walt node cp $remote_config_param ${node}:$node_config_param
     end_of_command_message
+    ./send_graph.sh
     exit 1
 fi
 

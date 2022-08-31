@@ -90,12 +90,12 @@ fi
 function create_name(){
     if [ "$graph_type" = "COMPLETE" ]
     then
-        n=$(get_config COMPLETEPARAM n $local_config_graph)
+        n=$(get_config COMPLETEPARAM n0 $local_config_graph)
         echo $graph_name$n
     elif [ "$graph_type" = "GRID" ]
     then
-        n=$(get_config GRIDPARAM n $local_config_graph)
-        m=$(get_config GRIDPARAM m $local_config_graph)
+        n=$(get_config GRIDPARAM n0 $local_config_graph)
+        m=$(get_config GRIDPARAM n1 $local_config_graph)
         if [ ${n} -gt ${m} ]; then
             temp=$n
             n=$m
@@ -104,11 +104,11 @@ function create_name(){
         echo $graph_name$n_$m
     elif [ "$graph_type" = "LINE" ]
     then
-        n=$(get_config LINEPARAM n $local_config_graph)
+        n=$(get_config LINEPARAM n0 $local_config_graph)
         echo $graph_name$n
     elif [ "$graph_type" = "CYCLE" ]
     then
-        n=$(get_config CYCLEPARAM n $local_config_graph)
+        n=$(get_config CYCLEPARAM n0 $local_config_graph)
         echo $graph_name$n
     else
         echo "Error type"

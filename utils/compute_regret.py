@@ -72,17 +72,17 @@ def str_int_float(iorf):
 	return str(iorf)
 
 def one_param_graph() :
-		n = graph_param["n"]
-		return True,graph_param["name"]+str(n)
+		n0 = graph_param["n0"]
+		return True,graph_param["name"]+str(n0)
 	
 def two_param_graph():
-	n = graph_param["n"]
-	m = graph_param["m"]
-	if n > m:
-		temp = n
-		n = m
-		m = temp
-	return False,graph_param["name"]+str(n)+"_"+str(m)
+	n0 = graph_param["n0"]
+	n1 = graph_param["n1"]
+	if n0 > n1:
+		temp = n0
+		n0 = n1
+		n1 = temp
+	return False,graph_param["name"]+str(n0)+"_"+str(n1)
 	
 def error_graph():
 	return False,"Error graph type"
@@ -213,10 +213,12 @@ if __name__ == "__main__":
 	offline_optimal = compute_offline_optimal(100)
 	
 	for i in range(num_nodes):		
-		online_output = get_latest_output(i)    	
+		online_output = []
+		online_output = get_latest_output(i) 
+		regret = []
 		regret = compute_regret(online_output, offline_optimal,fixed=True)
 		regret_file_name = create_new_regret_file_name(i)
-		
+		print(regret)
 		draw_regret(regret, regret_file_name+".png")		
 		save_regret_file(regret, i, regret_file_name)
 	    

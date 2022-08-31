@@ -10,3 +10,4 @@ utils/__pycache__/*
 dataset/*
 regrets/*
 graphs/*
+.*.log

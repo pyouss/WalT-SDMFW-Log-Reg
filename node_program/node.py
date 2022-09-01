@@ -228,9 +228,7 @@ def callback(ch,method,properties,body):
 		if should_demux_degree() :
 			ch.basic_ack(delivery_tag = method.delivery_tag)
 			channel.stop_consuming()
-			print(f" ----- before demux_degree {weight=} {payload=}")
 			weight = demux_degree()
-			print(f" ----- after demux_degree {weight=}")
 			return
 		ch.basic_ack(delivery_tag = method.delivery_tag)
 	elif payload.get('tag')=='y_vector':
@@ -344,43 +342,78 @@ def DMFW():
 	time_of_comm = 0
 	time_of_update = 0
 	time_of_data = 0
+	time_of_result = 0
+	overall_time = -time.time()
 	for t in range(T):
+		
 		time_of_round -= time.time()
+		
 		x = np.zeros(shape)
 		xs[0] = np.zeros(shape)
 		for l in range(L):
-			time_of_iteration -= time.time()
-			eta_l = min(eta / pow(l+1, eta_exp), 1.0)
-			v = lmo(noise(o[l]))
+			
 			time_of_comm -= time.time()
 			send_message_to_neighbours(xs[l],'y_vector')
 			update_y()
 			time_of_comm += time.time()
+
+			time_of_iteration -= time.time()
+			eta_l = min(eta / pow(l+1, eta_exp), 1.0)
+			v = lmo(noise(o[l]))
 			xs[l+1] = y + eta_l * (v - y)
 			x = xs[l+1]
 			time_of_iteration += time.time()
+
 		time_of_round += time.time()
+		
 		time_of_data -= time.time() 
 		x_data, y_data = receive_batch(t)
-		result.append(xs[L].reshape(f*c))
 		time_of_data += time.time()
 
+		time_of_result -= time.time()
+		result.append(xs[L].reshape(f*c))
+		time_of_result += time.time()
+
+		time_of_round -= time.time()
 		g = compute_gradient(xs[0])
 		h = g
 		for l in range(L):
+			time_of_comm -= time.time()
 			send_message_to_neighbours(g,'d_vector')
 			update_d()
+			time_of_comm += time.time()
+
+			time_of_iteration -= time.time()
 			tmp = compute_gradient(xs[l+1])
 			g = (tmp - h) + d
 			h = tmp
 			o[l+1] = o[l] + d
-	time_of_round = time_of_round / T 
-	time_of_data = time_of_data / T
-	time_of_comm = time_of_comm	/ (T*L)
-	time_of_iteration = time_of_iteration / (T*L)
+			time_of_iteration += time.time()
+
+		time_of_round += time.time()
+	overall_time += time.time()
+
+	time_of_round = time_of_round 
+	time_of_comm = time_of_comm
+	time_of_iteration = time_of_iteration
 	
-	print(f"{time_of_round=}\t{time_of_data=}\t{time_of_comm=}\t{time_of_iteration=}")
+	time_of_result -= time.time()
 	pd.DataFrame(result).to_csv("/persist/result.csv", index=False, header = False)
+	time_of_result += time.time()
+	
+	print(f"[EXECTIME]")
+	print(f"{T=}")
+	print(f"{L=}")
+	print(f"{data_file=}")
+	print(f"{batch_size=}")
+	print(f"{num_nodes=}")
+	print(f"{time_of_round=}")
+	print(f"{time_of_data=}")
+	print(f"{time_of_comm=}")
+	print(f"{time_of_iteration=}")
+	print(f"{time_of_result=}")
+	print(f"{overall_time=}")	
+
 if (os.path.exists("/persist/result.csv")) :
 	os.remove("/persist/result.csv")
 
@@ -393,9 +426,9 @@ start = time.time()
 DMFW()
 
 end = time.time()
-print("node_"+str(my_id)+" done !")
+#print("node_"+str(my_id)+" done !")
 
 
 
-print("Time taken: " + str(end - start)+ "s")
+#print("Time taken: " + str(end - start)+ "s")
 exit()

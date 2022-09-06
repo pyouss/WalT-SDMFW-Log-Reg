@@ -1,0 +1,54 @@
+[PARAM]
+t = 6
+l = 10
+batch_size = 600
+data_name = sorted_mnist.csv'
+num_nodes = 3
+
+[AVERAGE]
+time_of_rounds = 36.70158712069193
+time_of_data = 8.047908306121826
+time_of_comm = 33.69273813565572
+time_of_iteration = 2.7528377374013266
+time_of_result = 3.614260196685791
+overall_time = 44.749984423319496
+percentage_comm = 0.7529106114749444
+percentage_data = 0.17984158899344801
+percentage_leftover = 0.06724779953160753
+
+[NODE0]
+time_of_rounds = 37.08594727516174
+time_of_data = 7.559617042541504
+time_of_comm = 34.23884963989258
+time_of_iteration = 2.6060166358947754
+time_of_result = 3.6161653995513916
+overall_time = 44.64605522155762
+average_time_of_a_round = 6.1809912125269575
+average_time_of_a_data = 1.2599361737569172
+average_time_of_a_comm = 0.5706474939982097
+average_time_of_an_iteration = 0.043433610598246256
+
+[NODE1]
+time_of_rounds = 36.741613149642944
+time_of_data = 8.01993465423584
+time_of_comm = 33.651371002197266
+time_of_iteration = 2.8267781734466553
+time_of_result = 3.6015803813934326
+overall_time = 44.76203465461731
+average_time_of_a_round = 6.123602191607158
+average_time_of_a_data = 1.3366557757059734
+average_time_of_a_comm = 0.5608561833699545
+average_time_of_an_iteration = 0.047112969557444255
+
+[NODE2]
+time_of_rounds = 36.27720093727112
+time_of_data = 8.564173221588135
+time_of_comm = 33.18799376487732
+time_of_iteration = 2.825718402862549
+time_of_result = 3.625034809112549
+overall_time = 44.84186339378357
+average_time_of_a_round = 6.046200156211853
+average_time_of_a_data = 1.4273622035980225
+average_time_of_a_comm = 0.553133229414622
+average_time_of_an_iteration = 0.04709530671437581
+

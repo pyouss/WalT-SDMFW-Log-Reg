@@ -1,0 +1,78 @@
+[PARAM]
+t = 1
+l = 10
+batch_size = 600
+data_name = sorted_mnist.csv'
+num_nodes = 5
+
+[AVERAGE]
+time_of_rounds = 6.114313220977783
+time_of_data = 0.6548924922943116
+time_of_comm = 5.801225996017456
+time_of_iteration = 0.2869142532348633
+time_of_result = 3.26352596282959
+overall_time = 6.769308853149414
+percentage_comm = 0.8569894093868152
+percentage_data = 0.09674436585791524
+percentage_leftover = 0.046266224755269536
+
+[NODE0]
+time_of_rounds = 5.997699022293091
+time_of_data = 0.5454199314117432
+time_of_comm = 5.685190200805664
+time_of_iteration = 0.28566479682922363
+time_of_result = 3.2450473308563232
+overall_time = 6.543222188949585
+average_time_of_a_round = 5.997699022293091
+average_time_of_a_data = 0.5454199314117432
+average_time_of_a_comm = 0.5685190200805664
+average_time_of_an_iteration = 0.028566479682922363
+
+[NODE1]
+time_of_rounds = 6.168943881988525
+time_of_data = 0.6009314060211182
+time_of_comm = 5.858699321746826
+time_of_iteration = 0.28471994400024414
+time_of_result = 3.222454071044922
+overall_time = 6.769975185394287
+average_time_of_a_round = 6.168943881988525
+average_time_of_a_data = 0.6009314060211182
+average_time_of_a_comm = 0.5858699321746826
+average_time_of_an_iteration = 0.028471994400024413
+
+[NODE2]
+time_of_rounds = 6.2422966957092285
+time_of_data = 0.6561789512634277
+time_of_comm = 5.931476831436157
+time_of_iteration = 0.2852325439453125
+time_of_result = 3.24605655670166
+overall_time = 6.8985755443573
+average_time_of_a_round = 6.2422966957092285
+average_time_of_a_data = 0.6561789512634277
+average_time_of_a_comm = 0.5931476831436158
+average_time_of_an_iteration = 0.02852325439453125
+
+[NODE3]
+time_of_rounds = 6.17261528968811
+time_of_data = 0.70493483543396
+time_of_comm = 5.857368469238281
+time_of_iteration = 0.2891664505004883
+time_of_result = 3.302377939224243
+overall_time = 6.877645969390869
+average_time_of_a_round = 6.17261528968811
+average_time_of_a_data = 0.70493483543396
+average_time_of_a_comm = 0.5857368469238281
+average_time_of_an_iteration = 0.028916645050048827
+
+[NODE4]
+time_of_rounds = 5.990011215209961
+time_of_data = 0.7669973373413086
+time_of_comm = 5.673395156860352
+time_of_iteration = 0.28978753089904785
+time_of_result = 3.301693916320801
+overall_time = 6.757125377655029
+average_time_of_a_round = 5.990011215209961
+average_time_of_a_data = 0.7669973373413086
+average_time_of_a_comm = 0.5673395156860351
+average_time_of_an_iteration = 0.028978753089904784
+

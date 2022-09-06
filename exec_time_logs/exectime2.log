@@ -1,0 +1,54 @@
+[PARAM]
+t = 1
+l = 2
+batch_size = 50
+data_name = sorted_cifar10.csv'
+num_nodes = 3
+
+[AVERAGE]
+time_of_rounds = 6.015267054239909
+time_of_data = 1.6936202843983967
+time_of_comm = 5.945232391357422
+time_of_iteration = 0.052464564641316734
+time_of_result = 12.760138273239136
+overall_time = 7.708985328674316
+percentage_comm = 0.7712081600730974
+percentage_data = 0.2196943193157746
+percentage_leftover = 0.009097520611128007
+
+[NODE0]
+time_of_rounds = 5.2860753536224365
+time_of_data = 1.6465907096862793
+time_of_comm = 5.211401700973511
+time_of_iteration = 0.05254769325256348
+time_of_result = 12.846908569335938
+overall_time = 6.932767629623413
+average_time_of_a_round = 5.2860753536224365
+average_time_of_a_data = 1.6465907096862793
+average_time_of_a_comm = 2.6057008504867554
+average_time_of_an_iteration = 0.02627384662628174
+
+[NODE1]
+time_of_rounds = 6.636853218078613
+time_of_data = 1.6905319690704346
+time_of_comm = 6.569532632827759
+time_of_iteration = 0.05238628387451172
+time_of_result = 12.776193857192993
+overall_time = 8.327479362487793
+average_time_of_a_round = 6.636853218078613
+average_time_of_a_data = 1.6905319690704346
+average_time_of_a_comm = 3.2847663164138794
+average_time_of_an_iteration = 0.02619314193725586
+
+[NODE2]
+time_of_rounds = 6.122872591018677
+time_of_data = 1.7437381744384766
+time_of_comm = 6.054762840270996
+time_of_iteration = 0.052459716796875
+time_of_result = 12.657312393188477
+overall_time = 7.866708993911743
+average_time_of_a_round = 6.122872591018677
+average_time_of_a_data = 1.7437381744384766
+average_time_of_a_comm = 3.027381420135498
+average_time_of_an_iteration = 0.0262298583984375
+

@@ -64,8 +64,8 @@ To switch the dataset for the experiment, you can use the `modify_config.sh` scr
 ```
 The available options for the dataset parameter are:
 
-- mnist: This will change the default parameters for handling the MNIST dataset.
-- cifar10: This will change the default parameters for handling the CIFAR10 dataset.
+- `mnist`: This will change the default parameters for handling the MNIST dataset.
+- `cifar10`: This will change the default parameters for handling the CIFAR10 dataset.
 
 Here is an example of how to switch to the MNIST dataset:
 
@@ -151,7 +151,8 @@ Send the data to the nodes:
 cd dataset
 
 # Load the desired dataset (either MNIST or CIFAR10)
-./load_mnist.sh [mnist|cifar10]
+./download_preprocessed_dataset.sh [mnist|cifar10]
+./send_data.sh [mnsit|cifar10]
 ```
 
 Send the graph to the nodes:

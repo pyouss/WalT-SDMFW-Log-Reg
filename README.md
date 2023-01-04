@@ -2,14 +2,6 @@
 
 This project uses the Decentralized Meta Frank-Wolfe (SDMFW) algorithm to optimize multiclass logistic regression in a decentralized manner, using the MNIST and CIFAR10 datasets on a cluster of Raspberry Pi devices.
 This project is deployed on the WalT platform and provides scripts for parametrizing, launching, and receiving results from the experiment, as well as computing the regret analysis.
- # Setup
-To set up the environment for the experiment, run the following command:
-
-```bash
-./init.sh
-```
-
-This will create a `regret` folder where the results of the experiment will be saved.
 
 # Datasets
 This project is designed to handle the MNIST and CIFAR-10 datasets. 

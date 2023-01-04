@@ -161,6 +161,7 @@ def draw_regret(regret, name):
 	plt.xlabel("Number of Rounds T")
 	plt.ylabel("Regret")
 	plt.savefig(name)
+	plt.clf()
 
 
 def find_latest_result(node):

@@ -27,11 +27,11 @@ To modify the configuration parameters, you can use the `modify_config.sh` scrip
 ./modify_config.sh [parameter] [value]
 ```
 
-- bs: Modifies the batch size.
-- l: Modifies the number of iterations for training.
-- t: Modifies the number of online rounds.
-- trials: Modifies the number of restarts.
-- g: Modifies the type and size of the graph to be used in the experiment.
+- `bs`: Modifies the batch size.
+- `l`: Modifies the number of iterations for training.
+- `t`: Modifies the number of online rounds.
+- `trials`: Modifies the number of restarts.
+- `g`: Modifies the type and size of the graph to be used in the experiment.
 
 Here are some examples of how to use the modify_config.sh script:
 

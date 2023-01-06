@@ -27,7 +27,7 @@ if [[ $connection_failed != 0 ]];then
     exit 1
 fi
 
-exit 1
+
 for i in ${folder[*]}
 do
 	ssh $user@$server mkdir ${i} 2> /dev/null
@@ -44,8 +44,10 @@ create_dir "tmp"
 
 create_dir "regrets"
 
-create_dir "optimals"
+create_dir "outputs"
 
 create_dir "graphs"
 
 echo "Set up is ready to use."
+
+exit 1

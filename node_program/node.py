@@ -29,9 +29,12 @@ my_neighbors_degree = {}
 received_msg = []
 my_degree = 0
 my_id_info = id_config["MYID"]
+print("[GAPHINFO]")
 my_id = my_id_info["my_id"]
+print(f"{my_id=}")
 my_neighbors_info = id_config["NEIGHBORS"]
 my_neighbors = my_neighbors_info["neighbors"]
+print(f"{my_neighbors=}")
 my_neighbors = my_neighbors.split(',')
 for neighbor in my_neighbors:
     neighborhood_ids[neighbor] = my_degree
@@ -46,22 +49,39 @@ my_degree = len(neighborhood_ids)
 config_object = ConfigParser()
 config_object.read("/persist/param.conf")
 
-#Get the password
 datainfo = config_object["DATAINFO"]
-algoinfo = config_object["ALGOCONFIG"]
+print("[DATAINFO]")
 
 f = int(datainfo["f"])   # number of features
 dataset = datainfo["dataset"]
+print(f"{dataset=}")
 data_file = "/persist/"+dataset
 c = int(datainfo["c"])   # number of classes
+print(f"{c=}")
+algoinfo = config_object["ALGOCONFIG"]
+print("[ALGOCONFIG]")
 batch_size = int(algoinfo["batch_size"])
+print(f"{batch_size=}")
+sub_batch_size = int(algoinfo["sub_batch_size"])
+print(f"{sub_batch_size=}")
 L = int(algoinfo["l"])
+print(f"{L=}")
 T = int(algoinfo["t"])
+print(f"{T=}")
 num_nodes = int(algoinfo["num_nodes"])
+print(f"{num_nodes=}")
 r = float(algoinfo["r"])
+print(f"{r=}")
 eta = float(algoinfo["eta"])
+print(f"{eta=}")
 eta_exp = float(algoinfo["eta_exp"])
+print(f"{eta_exp=}")
+rho = float(algoinfo["rho"])
+print(f"{rho=}")
+rho_exp = float(algoinfo["rho_exp"])
+print(f"{rho_exp=}")
 reg = float(algoinfo["reg_coef"])
+print(f"{reg=}")
 
 dim = (f,c) # dimension of the output and messages
 shape = (f,c)
@@ -79,6 +99,7 @@ x_data = np.zeros([f,batch_size])
 y_data = np.zeros([batch_size])
 n = batch_size
 local_batch_size = int(batch_size/num_nodes)
+local_sub_batch_size = int(sub_batch_size/num_nodes)
 eta_l = 0
 
 neighborhood_y = []
@@ -225,6 +246,7 @@ def callback(ch,method,properties,body):
 		deg = payload.get('degree')
 		n_id = payload.get('id')
 		mux_degree(n_id,deg)
+		
 		if should_demux_degree() :
 			ch.basic_ack(delivery_tag = method.delivery_tag)
 			channel.stop_consuming()
@@ -276,7 +298,7 @@ def update_d():
 	channel.stop_consuming()
 
 
-def compute_gradient(x):
+def compute_exact_gradient(x):
 	data_size = x_data.shape[1]
 	z = x.T @ x_data
 	tmp_exp = np.exp(z)
@@ -285,6 +307,22 @@ def compute_gradient(x):
 	tmp_exp[y_data,range(data_size)] = tmp_exp[y_data,range(data_size)] - 1
 	return (x_data / data_size) @ tmp_exp.T
 
+def compute_stoch_gradient(x,s=local_sub_batch_size):
+	sub_batch = np.floor(np.random.rand(s)*local_batch_size).astype(int)
+	x_stoch_data,y_stoch_data = x_data[:, sub_batch], y_data[sub_batch]
+	data_size = x_stoch_data.shape[1]
+	z = x.T @ x_stoch_data
+	tmp_exp = np.exp(z)
+	tmp_denominator= np.sum(tmp_exp,axis=0)
+	tmp_exp = tmp_exp / tmp_denominator
+	tmp_exp[y_stoch_data,range(data_size)] = tmp_exp[y_stoch_data,range(data_size)] - 1
+	return (x_stoch_data / data_size) @ tmp_exp.T
+
+compute_gradient_fns = {}
+compute_gradient_fns[True] = compute_exact_gradient
+compute_gradient_fns[False] = compute_stoch_gradient
+
+compute_gradient = compute_gradient_fns[local_sub_batch_size == local_batch_size]
 
 def lmo(o):
 	res = np.zeros(o.shape)
@@ -384,10 +422,12 @@ def DMFW():
 			time_of_comm += time.time()
 
 			time_of_iteration -= time.time()
+			rho_l = min(rho / pow(l+1,rho_exp), 1.0)
 			tmp = compute_gradient(xs[l+1])
 			g = (tmp - h) + d
 			h = tmp
-			o[l+1] = o[l] + d
+			a = rho_l * a + a
+			o[l+1] = o[l] + a
 			time_of_iteration += time.time()
 
 		time_of_round += time.time()
@@ -417,8 +457,8 @@ def DMFW():
 if (os.path.exists("/persist/result.csv")) :
 	os.remove("/persist/result.csv")
 
-degree_exchange()
 
+degree_exchange()
 
 
 start = time.time()
@@ -426,9 +466,5 @@ start = time.time()
 DMFW()
 
 end = time.time()
-#print("node_"+str(my_id)+" done !")
 
-
-
-#print("Time taken: " + str(end - start)+ "s")
 exit()

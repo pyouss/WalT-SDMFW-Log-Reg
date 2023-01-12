@@ -136,7 +136,7 @@ function get_result(){
     #fi
     echo "Transfering results from node to walt server."
     ssh $user@$server walt node cp $2:$node_result_path $remote_result_path
-    echo $user@$server walt node cp $2:$node_result_path $remote_result_path
+    #echo $user@$server walt node cp $2:$node_result_path $remote_result_path
     end_of_command_message
     echo "Transefering results from walt server to local machine."
     scp $user@$server:$remote_result_path $local_result_path 

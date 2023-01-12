@@ -1,6 +1,7 @@
+#!/usr/bin/python3
+
 import configparser as cp
 import sys
-sys.path.append('..')
 
 param_config = cp.ConfigParser()
 param_config.read('config/param.conf')
@@ -66,13 +67,15 @@ def modify_iterations(L=L):
 
 
 def modify_batch_size(batch_size=batch_size):
+	if int(sub_batch_size) > int(batch_size):
+		return False
 	param_config.set('ALGOCONFIG','batch_size',str(batch_size))
 	return True
 
 def modify_sub_batch_size(sub_batch_size=sub_batch_size):
-	if sub_batch_size > batch_size:
+	if int(sub_batch_size) > int(batch_size):
 		return False
-	param_config.set('ALGOCONFIG','batch_size',str(sub_batch_size))
+	param_config.set('ALGOCONFIG','sub_batch_size',str(sub_batch_size))
 	return True
 
 def modify_walt_user(user=user):
@@ -162,18 +165,18 @@ if __name__ == "__main__":
 	
 			if modified:
 				update_configs()
-				exit_success(2)
+				exit_success("The graph topology is modified.")
 	
 	if argc == 3:
 		if sys.argv[1].upper() in {"USER","U"}:
 			modified = modify_walt_user(str(sys.argv[2]))
 			update_configs()
-			exit_success(3)
+			exit_success("The user name is modified.")
 
 		if sys.argv[1].upper() in {"SERVER","S"}:
 			modified = modify_walt_server(str(sys.argv[2]))
 			update_configs()
-			exit_success(3)
+			exit_success("The server is modified.")
 
 		if sys.argv[1].upper() == "T":
 			if not checkInt(str(sys.argv[2])):
@@ -202,7 +205,7 @@ if __name__ == "__main__":
 		
 		if modified :
 			update_configs()
-			exit_success(1)
+			exit_success("The parameters are modified.")
 	
 		exit_error("Incorrect argument.")
 
@@ -216,7 +219,7 @@ if __name__ == "__main__":
 	
 		if modified :
 			update_configs()
-			exit_success(1)
+			exit_success(f"The parameters are set to default values for {sys.argv[1].upper()} dataset.")
 	
 		exit_error("Incorrect argument.")
 	

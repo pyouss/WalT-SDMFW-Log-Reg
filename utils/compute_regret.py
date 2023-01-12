@@ -154,8 +154,9 @@ def optimal_path():
 
 def draw_regret(regret, name):
 	figure(1, figsize=(10, 6))
-	x_axis = [i for i in range(1, T+1)]
-	plt.scatter(x_axis, regret)
+	regret0 = [0.0] + regret
+	x_axis = [i for i in range(T)]
+	plt.plot(x_axis, regret0)
 	title = result_path()
 	plt.title(title)
 	plt.xlabel("Number of Rounds T")

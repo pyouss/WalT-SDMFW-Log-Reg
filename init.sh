@@ -31,6 +31,7 @@ fi
 for i in ${folder[*]}
 do
 	ssh $user@$server mkdir ${i} 2> /dev/null
+    echo "Creating '${i}' folder in the server."
 done
 
 function create_dir(){
@@ -41,12 +42,17 @@ function create_dir(){
 }
 
 create_dir "tmp"
+echo "Creating 'tmp' folder."
 
 create_dir "regrets"
+echo "Creating 'regrets' folder."
 
 create_dir "outputs"
+echo "Creating 'outputs' folder."
 
 create_dir "graphs"
+echo "Creating 'graphs' folder."
+
 
 echo "Set up is ready to use."
 

@@ -426,8 +426,8 @@ def DMFW():
 			tmp = compute_gradient(xs[l+1])
 			g = (tmp - h) + d
 			h = tmp
-			a = rho_l * a + a
-			o[l+1] = o[l] + a
+			a = (1-rho_l) * a + d
+			o[l+1] = o[l] + d
 			time_of_iteration += time.time()
 
 		time_of_round += time.time()

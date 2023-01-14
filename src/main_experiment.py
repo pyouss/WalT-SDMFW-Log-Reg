@@ -14,7 +14,11 @@ from experiment.compute_regret import compute_regret
 from experiment.launch_experiment import launch_experiment
 from experiment.get_result import get_result
 from experiment.store_exec_time import store_exec_time
+import utils.walt_handler as wh 
 import docopt
+
+
+wh.ssh_check()
 
 if not is_locked():
     print("Your configurations are unlocked.")

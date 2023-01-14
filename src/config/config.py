@@ -19,29 +19,13 @@ Options:
 """
 import sys
 import docopt
-import configparser as cp
-from utils.lock import unlock_modifications,is_locked
 import subprocess
+from utils.lock import lock_modifications,unlock_modifications,is_locked
 from utils.routes import SRC_DIR,ROOT_DIR
 from config.send_graph import send_graph
 from config.send_config import send_config
+from utils.configs_values import *
 
-
-param_config = cp.ConfigParser()
-param_config.read(f'{ROOT_DIR}/config/param.conf')
-
-envi_config = cp.ConfigParser()
-envi_config.read(f'{ROOT_DIR}/config/envi.conf')
-
-graph_config = cp.ConfigParser()
-graph_config.read(f'{ROOT_DIR}/config/graph.conf')
-n0 = graph_config["COMPLETEPARAM"]["n0"]
-T = param_config["ALGOCONFIG"]["t"]
-L = param_config["ALGOCONFIG"]["l"]
-batch_size = param_config["ALGOCONFIG"]["batch_size"]
-sub_batch_size = param_config["ALGOCONFIG"]["sub_batch_size"]
-user = envi_config["ENVCONFIG"]["user"]
-server = envi_config["ENVCONFIG"]["server"]
 
 def checkInt(str):
     if str[0] in ('-', '+'):
@@ -267,6 +251,7 @@ def main():
     if args['send']:
         send_graph()
         send_config()
+        lock_modifications()
 
     if args['unlock']:
         unlock_modifications()

@@ -25,6 +25,7 @@ from system.connect_nodes import connect_nodes
 from system.start_rabbit_node import start_rabbit_node
 from system.clear_rabbit_node import clear_rabbit_node
 from datahandler.download_dataset import download_dataset
+from datahandler.send_data import send_data
 
 args = docopt.docopt(__doc__)
 

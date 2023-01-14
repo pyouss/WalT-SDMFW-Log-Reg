@@ -10,6 +10,7 @@ from pylab import figure, axes, title
 from scipy.special import softmax
 from configparser import ConfigParser
 import utils.logistic_regression as log_r
+from utils.configs_values import *
 
 
 def compute_regret():
@@ -21,50 +22,6 @@ def compute_regret():
     pd.set_option('display.width', None)
     pd.set_option('display.max_colwidth', None)
 
-
-
-    #Read config.ini file
-    param_config = ConfigParser()
-    param_config.read("config/param.conf")
-
-    node_object = ConfigParser()
-    node_object.read("config/node.conf")
-
-    graph_config = ConfigParser()
-    graph_config.read("config/graph.conf")
-
-    #Get the password
-    datainfo = param_config["DATAINFO"]
-    algoinfo = param_config["ALGOCONFIG"]
-    fwinfo = param_config["FWCONFIG"]
-    nodeinfo = node_object["NODEINFO"]
-
-    f = int(datainfo["f"])   # number of features
-    dataset = datainfo["dataset"]
-    c = int(datainfo["c"])   # number of classes
-    decentralized_batch_size = int(algoinfo["batch_size"])
-    L = int(algoinfo["l"])
-    T = int(algoinfo["t"])
-    r = float(algoinfo["r"])
-    num_nodes = int(algoinfo["num_nodes"])
-    dataname = dataset.split(".", 1)[0]
-    dim = f*c
-    batch_size =  decentralized_batch_size
-
-
-    graph_type = graph_config["GRAPHTYPE"]
-
-    graph_param = graph_config[graph_type["type"]+"PARAM"]
-
-    algoconfig = param_config["ALGOCONFIG"]
-    eta = float(algoinfo["eta"])
-    eta_exp = float(algoinfo["eta_exp"])
-    rho = float(algoinfo["rho"])
-    rho_exp = float(algoinfo["rho_exp"])
-
-    eta_fw = float(fwinfo["eta"])
-    eta_exp_fw = float(fwinfo["eta_exp"])
-    L_fw = int(fwinfo["l"])
 
 
     def str_int_float(iorf):
@@ -90,12 +47,6 @@ def compute_regret():
 
     graph_function_name = {"complete" : one_param_graph, "grid": two_param_graph, "line": one_param_graph, "cycle": one_param_graph}
     create_graph_name = graph_function_name[graph_param["name"]]
-
-    nodes=[]
-    for i in range(num_nodes):
-        section = "node_"+str(i)
-        node_name = nodeinfo[section]
-        nodes.append(node_name)
 
 
     shape = (f,c)
@@ -146,7 +97,7 @@ def compute_regret():
     def result_path():
         verified_type,graph_name = create_graph_name()
 
-        path = graph_name +"-"+"nodes"+str(num_nodes)+"-"+dataname+"-batch_size"+str(decentralized_batch_size)+"-T"+str(T)+"-L"+str(L)+"-r"+str_int_float(r)+\
+        path = graph_name +"-"+"nodes"+str(num_nodes)+"-"+dataname+"-batch_size"+str(batch_size)+"-T"+str(T)+"-L"+str(L)+"-r"+str_int_float(r)+\
             "-eta"+str_int_float(eta)+"-eta_exp"+str_int_float(eta_exp)+"-rho"+str_int_float(rho)+"-rho_exp"+str_int_float(rho_exp)
         return path
 

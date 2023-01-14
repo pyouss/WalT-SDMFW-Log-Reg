@@ -56,6 +56,7 @@ eta_fw = float(fwinfo["eta"])
 eta_exp_fw = float(fwinfo["eta_exp"])
 L_fw = int(fwinfo["l"])
 
+shape = (f,c)
 
 
 
@@ -74,5 +75,64 @@ rabbit_image = image_config["IMAGECONF"]["rabbit_image"]
 node_image = image_config["IMAGECONF"]["node_image"]
 
 
+def str_int_float(iorf):
+    if int(iorf) == iorf:
+        return str(int(iorf))
+    return str(iorf)
 
+def one_param_graph() :
+        n0 = graph_param["n0"]
+        return True,graph_param["name"]+str(n0)
     
+def two_param_graph():
+    n0 = graph_param["n0"]
+    n1 = graph_param["n1"]
+    if n0 > n1:
+        temp = n0
+        n0 = n1
+        n1 = temp
+    return False,graph_param["name"]+str(n0)+"_"+str(n1)
+    
+def error_graph():
+    return False,"Error graph type"
+
+graph_function_name = {"complete" : one_param_graph, "grid": two_param_graph, "line": one_param_graph, "cycle": one_param_graph}
+create_graph_name = graph_function_name[graph_param["name"]]
+
+
+verified_type,graph_name = create_graph_name()
+
+def checkInt(str):
+    if str[0] in ('-', '+'):
+        return str[1:].isdigit()
+    return str.isdigit()
+
+def grid_test(size, param):
+    if int(size) != int(param[0]) * int(param[1]):
+        print("Error : Size and parameter do not match")
+        return False
+    return True
+
+def one_param_test(size,param):
+    if len(param) == 1:
+        if int(param[0]) == int(size):
+            return True
+        else :
+            print("Error : Size and parameter do not match")
+            return False    
+    print("Error : Incorrect number of parameters")
+    return False
+
+special_graph_tests = {
+'GRID': (grid_test,2), 
+'COMPLETE':(one_param_test,1), 
+'LINE': (one_param_test,1), 
+'CYCLE':(one_param_test,1) }
+
+def print_config_values():
+    print(f"{dataname=}")
+    print(f"{T=}")
+    print(f"{L=}")
+    print(f"{graph_name=}")
+    decentralized_batch_size = int(batch_size/num_nodes)
+    print(f"{decentralized_batch_size=}")

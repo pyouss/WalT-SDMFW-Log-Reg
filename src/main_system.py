@@ -5,6 +5,7 @@ Usage:
     ./sys init  
     ./sys init <username> <servername>
     ./sys boot
+    ./sys boot all
     ./sys connect ap
     ./sys connect nodes [options]
     ./sys clean queues
@@ -24,6 +25,7 @@ from system.init import init
 from system.connect_nodes import connect_nodes
 from system.start_rabbit_node import start_rabbit_node
 from system.clear_rabbit_node import clear_rabbit_node
+from system.boot_nodes import boot_nodes
 from datahandler.download_dataset import download_dataset
 from datahandler.send_data import send_data
 
@@ -33,7 +35,7 @@ if args["init"]:
     init(args)
 
 if args["boot"]:
-    boot()
+    boot_nodes(args)
 
 if args["connect"] and args["ap"]:
     start_rabbit_node()

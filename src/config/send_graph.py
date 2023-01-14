@@ -10,7 +10,7 @@ from utils.create_graph import create_graph
 from utils.routes import ROOT_DIR
 from utils.configs_values import *
 
-local_config_param = "config/param.conf"
+local_config_param = f"{ROOT_DIR}config/param.conf"
 remote_config_param = "config/param.conf"
 node_config_graph= "/persist/my_id.conf"
 

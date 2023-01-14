@@ -6,8 +6,9 @@ Usage:
     ./configure mnist
     ./configure cifar10
     ./configure user <user> server <server>
-    ./configure send
+    ./configure sync
     ./configure unlock
+    ./configure show
     ./configure -h
 
 Options:
@@ -27,32 +28,6 @@ from config.send_config import send_config
 from utils.configs_values import *
 
 
-def checkInt(str):
-    if str[0] in ('-', '+'):
-        return str[1:].isdigit()
-    return str.isdigit()
-
-def grid_test(size, param):
-    if int(size) != int(param[0]) * int(param[1]):
-        print("Error : Size and parameter do not match")
-        return False
-    return True
-
-def one_param_test(size,param):
-    if len(param) == 1:
-        if int(param[0]) == int(size):
-            return True
-        else :
-            print("Error : Size and parameter do not match")
-            return False    
-    print("Error : Incorrect number of parameters")
-    return False
-
-special_graph_tests = {
-'GRID': (grid_test,2), 
-'COMPLETE':(one_param_test,1), 
-'LINE': (one_param_test,1), 
-'CYCLE':(one_param_test,1) }
 
 def modify_graph(type="COMPLETE", size=n0 ,param=[n0]):
     type = type.upper()
@@ -102,7 +77,7 @@ def modify_cifar10():
     param_config.set('DATAINFO','c','10')
     param_config.set('ALGOCONFIG','r','32')
     param_config.set('ALGOCONFIG','batch_size','500')
-    param_config.set('ALGOCONFIG','sub_batch_size','4')
+    param_config.set('ALGOCONFIG','sub_batch_size','500')
     param_config.set('ALGOCONFIG','l','10')
     param_config.set('ALGOCONFIG','t','100')
     param_config.set('ALGOCONFIG','eta','0.1')
@@ -174,6 +149,9 @@ def exit_locked():
 def main():
     modified = False
     args = docopt.docopt(__doc__)
+    if args["show"]:
+        print_config_values()
+
     if not args["unlock"] and is_locked(): 
         exit_locked()
 
@@ -248,7 +226,7 @@ def main():
         modified = modify_walt_server(server=args['<server>'])
         update_configs()
 
-    if args['send']:
+    if args['sync']:
         send_graph()
         send_config()
         lock_modifications()

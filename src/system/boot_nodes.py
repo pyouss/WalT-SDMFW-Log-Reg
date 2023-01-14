@@ -4,11 +4,11 @@ import configparser as cp  # import the ConfigParser module
 import sys
 import subprocess
 from utils.routes import ROOT_DIR
-from configs_values import *
+from utils.configs_values import *
 
-def boot_nodes():
+def boot_nodes(args):
 
-    if len(sys.argv) == 2 and sys.argv[1] == "a":
+    if args["all"]:
         print(f"Remote booting {center_node} with {rabbit_image}")
         cmd = f"walt node boot {center_node} {rabbit_image}"
         subprocess_result = subprocess.Popen(
@@ -20,8 +20,7 @@ def boot_nodes():
         print(f"{subprocess_result[1].decode()}")
 
 
-    for node in working_nodes:
-        node_name = nodes[node]
+    for node_name in working_nodes:
         print(f"Remote booting {node_name} with {node_image}")
         cmd = f"walt node boot {node_name} {node_image}"
         subprocess_result = subprocess.Popen(

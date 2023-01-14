@@ -10,7 +10,7 @@ from utils.routes import ROOT_DIR
 from utils.configs_values import *
 
 local_config_param = f"{ROOT_DIR}/config/param.conf"
-remote_config_param = f"{ROOT_DIR}/config/param.conf"
+remote_config_param = f"config/param.conf"
 node_config_param= "/persist/param.conf"
 
 def send_config():
@@ -21,8 +21,8 @@ def send_config():
             shell=True, stdout=subprocess.PIPE, 
             stderr=subprocess.PIPE
             ).communicate()
-    #print(f"{subprocess_result[0].decode()}")
-    #print(f"{subprocess_result[1].decode()}")
+    print(f"{subprocess_result[0].decode()}")
+    print(f"{subprocess_result[1].decode()}")
     print("Done.")
     print()
 
@@ -35,8 +35,8 @@ def send_config():
             shell=True, stdout=subprocess.PIPE, 
             stderr=subprocess.PIPE
             ).communicate()
-        #print(f"{subprocess_result[0].decode()}")
-        #print(f"{subprocess_result[1].decode()}")   
+        print(f"{subprocess_result[0].decode()}")
+        print(f"{subprocess_result[1].decode()}")   
         print("Done.")
         print()
 

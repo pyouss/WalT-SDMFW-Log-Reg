@@ -2,28 +2,30 @@ from utils.configs_values import *
 import pandas as pd
 import os
 import numpy as np
+from utils.routes import *
+
 
 def create_directory(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
 def regret_path(i):
-    path = f"{ROOT_DIR}/regrets/{graph_name}-nodes{num_nodes}-{dataname}-batch_size{batch_size}-T{T}-L{L}-r{r}-eta{eta}-eta_exp{eta_exp}-rho{rho}-rho_exp{rho_exp}/node{i}"
+    path = f"{REGRET_DIR}/{graph_name}-nodes{num_nodes}-{dataname}-batch_size{batch_size}-T{T}-L{L}-r{r}-eta{eta}-eta_exp{eta_exp}-rho{rho}-rho_exp{rho_exp}/node{i}"
     return path
 
 def result_path(i):
-    path = f"{ROOT_DIR}/outputs/{graph_name}-nodes{num_nodes}-{dataname}-batch_size{batch_size}-T{T}-L{L}-r{r}-eta{eta}-eta_exp{eta_exp}-rho{rho}-rho_exp{rho_exp}/node{i}"
+    path = f"{OUTPUTS_DIR}/{graph_name}-nodes{num_nodes}-{dataname}-batch_size{batch_size}-T{T}-L{L}-r{r}-eta{eta}-eta_exp{eta_exp}-rho{rho}-rho_exp{rho_exp}/node{i}"
     return path
 
 def optimal_path():
-    path = f"{ROOT_DIR}/outputs/{dataname}-T{T}-L{L}-r{r}"
+    path = f"{OUTPUTS_DIR}/{dataname}-T{T}-L{L}-r{r}"
     return path
 
 
-def create_new_regret_file_name(i):
+def create_new_regret_file_name(i,extension=".csv"):
     regret_path_node = regret_path(i)
     create_directory(regret_path_node)
-    return f"{regret_path_node}/regret.csv"
+    return f"{regret_path_node}/regret{extension}"
     
 def save_regret_file(regret, i, regret_file_name):
     df_regret = pd.DataFrame(regret).T

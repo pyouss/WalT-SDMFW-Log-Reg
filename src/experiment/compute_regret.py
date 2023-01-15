@@ -62,8 +62,8 @@ def run_compute_regret():
         online_output = get_latest_output(i) 
         regret = []
         regret = compute_regret(online_output, offline_optimal,fixed=True)
-        regret_file_name = create_new_regret_file_name(i)
-        regret_plot_file_name = create_new_regret_file_name(i,extension="png") 
+        regret_file_name = create_new_regret_file_name(i,extension=".csv")
+        regret_plot_file_name = create_new_regret_file_name(i,extension=".png") 
         print(regret)
         save_regret_file(regret, i, regret_plot_file_name)
         draw_regret(regret, f"{regret_plot_file_name}", f"Regret of node {i} in {graph_name}, {dataset=} {T=} {batch_size=} {L=}")        

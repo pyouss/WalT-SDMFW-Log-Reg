@@ -12,3 +12,4 @@ regrets/*
 graphs/*
 .*.log
 exec_time_logs/*
+.lock

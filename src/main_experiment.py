@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 """
 Usage:
-    ./experiment launch
-    ./experiment [options]
+    ./experiment
     ./experiment time
+    ./experiment [options]
     ./configure -h
 
 Options:
@@ -25,7 +25,7 @@ if not is_locked():
     print("This indicates that your configurations might not be synchronized with the remote server.")
     print()
     print("The experiment launcher is blocked until you send the current configurations by using :")
-    print("\t./configure send")
+    print("\t./configure sync")
     exit()
 
 
@@ -38,7 +38,8 @@ get_result()
 run_compute_regret()
 
 if args["time"]:
-	store_exec_time()
+    print("Storing time of computations")
+    store_exec_time()
 
 print()
 unlock_modifications()

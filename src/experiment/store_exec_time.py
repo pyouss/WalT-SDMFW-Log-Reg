@@ -3,6 +3,7 @@ import sys
 import shutil
 import numpy as np
 from configparser import ConfigParser
+from utils.routes import EXEC_DIR
 
 def exit_error(msg):
 	print(f"Error : {msg}")
@@ -11,7 +12,7 @@ def exit_error(msg):
 def store_exec_time():
 	exectime_log = []
 	exectime_log.append(ConfigParser())
-	exectime_log[0].read(".exectime0.log")
+	exectime_log[0].read(f"{EXEC_DIR}/.exectime0.log")
 
 	num_nodes = exectime_log[0]["EXECTIME"]["num_nodes"]
 
@@ -22,7 +23,7 @@ def store_exec_time():
 	for i in range(1,int(num_nodes)):
 		
 		exectime_log.append(ConfigParser())
-		exectime_log[i].read(f".exectime{i}.log")
+		exectime_log[i].read(f"{EXEC_DIR}/.exectime{i}.log")
 		if T != exectime_log[i]["EXECTIME"]["T"]:
 			exit_error(f"Incoherents logs ! T is diferent in each file.")
 		if L != exectime_log[i]["EXECTIME"]["L"]:
@@ -74,8 +75,8 @@ def store_exec_time():
 			"average_time_of_a_comm" : str(time_of_comm[i]/(T*L)),
 			"average_time_of_an_iteration" : str(time_of_iteration[i]/(T*L))
 		}
-	files = os.listdir("exec_time_logs")
+	all_files = os.listdir(EXEC_DIR)
+	files = [f for f in all_files if f[0] != "."]
 	i = max([0] + [int(f[8:-4])+1 for f in files]) 
-	res.write(open(f"exec_time_logs/exectime{i}.log", 'w'))
-
+	res.write(open(f"{EXEC_DIR}/exectime{i}.log", 'w'))
 

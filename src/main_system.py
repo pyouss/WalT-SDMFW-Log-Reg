@@ -2,8 +2,10 @@
 
 """
 Usage:
-    ./sys init  
+    ./sys init
+    ./sys init clone force
     ./sys init <username> <servername>
+    ./sys init <username> <servername>  clone force
     ./sys boot
     ./sys boot all
     ./sys connect ap

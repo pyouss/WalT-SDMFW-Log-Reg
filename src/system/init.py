@@ -6,6 +6,8 @@ import docopt
 from config.config import modify_walt_user,modify_walt_server,update_configs
 from utils.routes import ROOT_DIR
 from utils.configs_values import *
+import utils.walt_handler as wh
+from utils.exit_handlers import *
 
 
 dependencies = sorted(['scipy', 'configparser', 'numpy', 'pandas', 'matplotlib', 'unittest', 'mat73', 'docopt'])
@@ -30,62 +32,26 @@ def init(args):
         modify_walt_server(args['<servername>'])
         update_configs()
 
-    print("Checking dependencies ...")
+    print_title("Checking dependencies")
     check_and_install(dependencies)
+    print_end()
 
     folders = ["graphs","dataset","config","result","tmp","node_program"]
-    print()
-    print("Checking if connection by ssh is working fine ...")
-    ssh_check = subprocess.Popen(
-        f"ssh {user}@{server} echo ok", 
-        shell=True, stdout=subprocess.PIPE, 
-        stderr=subprocess.PIPE
-        ).communicate()
-
-    if ssh_check[0] != b'ok\n':
-        print(f"Error : {user=} and {server=} are not correct.")
-        print(f"\tUse `./init.py -h` if you need help initializing your username and WalT server name.")
-        exit()
-    else: 
-        print("ssh connection is checked.")
-    print()
-    print("Retrieve walt images from the hub ...")
-
-
-    cmd = "walt image clone hub:youssefp/sdmfw-logistic-regression"
-    subprocess_result = subprocess.Popen(
-            f"ssh {user}@{server} {cmd}", 
-            shell=True, stdout=subprocess.PIPE, 
-            stderr=subprocess.PIPE
-            ).communicate()
-    print(subprocess_result[0].decode())
-    print(subprocess_result[1].decode())
-
-
-    cmd = "walt image clone hub:youssefp/rabbit-node:rpi"
-    subprocess_result = subprocess.Popen(
-            f"ssh {user}@{server} {cmd}", 
-            shell=True, stdout=subprocess.PIPE, 
-            stderr=subprocess.PIPE
-            ).communicate()
-    print(subprocess_result[0].decode())
-    print(subprocess_result[1].decode())
-    print()
-
     
-    print("Create all the needed directories ...")
+    wh.ssh_check()
+    
+    print_title("Create all the needed directories")
     for folder in folders:
-        cmd=f"mkdir {folder}"
-        subprocess_result = subprocess.Popen(
-            f"ssh {user}@{server} {cmd}", 
-            shell=True, stdout=subprocess.PIPE, 
-            stderr=subprocess.PIPE
-            ).communicate()
-
+        wh.walt_mkdir(folder)
         if not os.path.exists(f"{ROOT_DIR}/{folder}"):
             os.makedirs(folder)
+    print_end()
 
+    wh.walt_image_clone("sdmfw-logistic-regression","hub:youssefp/sdmfw-logistic-regression", force = args["force"])
+    wh.walt_image_clone("rabbit-node:rpi","hub:youssefp/rabbit-node:rpi",force = args["force"])
 
-    print("Set up is ready.")
+    
+
+    print_end("Set up is ready.")
 
 

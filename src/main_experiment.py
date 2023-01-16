@@ -2,12 +2,12 @@
 """
 Usage:
     ./experiment
-    ./experiment launch [option]
+    ./experiment launch [options]
     ./experiment [options]
     ./configure -h
 
 Options:
-    -t, --time                          Stores timing of operations.
+    --time                              Stores timing of operations.
     -h, --help                          Show this help message and exit.
 """
 from utils.lock import unlock_modifications,is_locked

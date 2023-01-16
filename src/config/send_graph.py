@@ -7,10 +7,10 @@ import sys
 import subprocess
 from utils.lock import lock_modifications
 from utils.create_graph import create_graph 
-from utils.routes import ROOT_DIR
+from utils.routes import ROOT_DIR,CONFIG_DIR,GRAPH_DIR
 from utils.configs_values import *
 
-local_config_param = f"{ROOT_DIR}config/param.conf"
+local_config_param = f"{CONFIG_DIR}/param.conf"
 remote_config_param = "config/param.conf"
 node_config_graph= "/persist/my_id.conf"
 
@@ -20,11 +20,12 @@ def send_graph():
 
     for i in range(num_nodes):
         node_name = working_nodes[i]
+        local_graph_file_name = f"{GRAPH_DIR}/node_{i}"
         graph_file_name = f"graphs/node_{i}.conf"
         
         print(f"Transfering graph to walt server ...")
         subprocess_result = subprocess.Popen(
-            f"echo y | scp {graph_file_name} {user}@{server}:{graph_file_name}", 
+            f"echo y | scp {local_graph_file_name} {user}@{server}:{graph_file_name}", 
             shell=True, stdout=subprocess.PIPE, 
             stderr=subprocess.PIPE
             ).communicate()

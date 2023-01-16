@@ -1,6 +1,6 @@
 import subprocess
 import configparser as cp
-from utils.routes import ROOT_DIR
+from utils.routes import ROOT_DIR,DATASET_DIR
 from utils.configs_values import *
 import utils.walt_handler as wh
 
@@ -13,7 +13,7 @@ def send_data(args):
     elif args["cifar10"]:
         dataset_name = "sorted_cifar10.csv"
     
-    local_dataset_path = f"{ROOT_DIR}/dataset/{dataset_name}"
+    local_dataset_path = f"{DATASET_DIR}/{dataset_name}"
     remote_dataset_path = f"dataset/{dataset_name}"
     node_dataset_path = f"/persist/dataset/{dataset_name}"
 

@@ -5,7 +5,10 @@ Usage:
     ./configure graph <graph_type> <size>
     ./configure mnist
     ./configure cifar10
+    ./configure localhost
     ./configure user <user> server <server>
+    ./configure add <node_name>
+    ./configure add <node_name> model <model_name>
     ./configure sync
     ./configure unlock
     ./configure show

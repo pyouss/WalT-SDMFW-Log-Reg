@@ -6,10 +6,10 @@ import configparser as cp  # import the ConfigParser module
 import sys
 import subprocess
 from utils.lock import lock_modifications
-from utils.routes import ROOT_DIR
+from utils.routes import ROOT_DIR,CONFIG_DIR
 from utils.configs_values import *
 
-local_config_param = f"{ROOT_DIR}/config/param.conf"
+local_config_param = f"{CONFIG_DIR}/param.conf"
 remote_config_param = f"config/param.conf"
 node_config_param= "/persist/param.conf"
 

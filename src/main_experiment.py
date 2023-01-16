@@ -2,11 +2,12 @@
 """
 Usage:
     ./experiment
-    ./experiment time
+    ./experiment launch [option]
     ./experiment [options]
     ./configure -h
 
 Options:
+    -t, --time                          Stores timing of operations.
     -h, --help                          Show this help message and exit.
 """
 from utils.lock import unlock_modifications,is_locked
@@ -31,13 +32,14 @@ if not is_locked():
 
 args = docopt.docopt(__doc__)
 
-launch_experiment()
+if args["launch"]:
+    launch_experiment()
 
 get_result()
 
 run_compute_regret()
 
-if args["time"]:
+if args["--time"]:
     print("Storing time of computations")
     store_exec_time()
 

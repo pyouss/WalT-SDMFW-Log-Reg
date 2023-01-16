@@ -9,102 +9,103 @@ from scipy.special import softmax
 from configparser import ConfigParser
 
 
+try:
+    np.set_printoptions(threshold = np.inf) 
+    np.set_printoptions(suppress = True)
 
-np.set_printoptions(threshold = np.inf) 
-np.set_printoptions(suppress = True)
-
-credentials = pika.PlainCredentials('admin','password')
-param = pika.ConnectionParameters('10.0.1.1','5672','/',credentials, heartbeat=600,
-                                       blocked_connection_timeout=600)
-connection = pika.BlockingConnection(param)
-channel = connection.channel()
+    credentials = pika.PlainCredentials('admin','password')
+    param = pika.ConnectionParameters('10.0.1.1','5672','/',credentials, heartbeat=600,
+                                           blocked_connection_timeout=600)
+    connection = pika.BlockingConnection(param)
+    channel = connection.channel()
 
 
-# Variables and configurations
+    # Variables and configurations
 
-id_config = ConfigParser()
-id_config.read("/persist/my_id.conf")
-neighborhood_ids = {}
-my_neighbors_degree = {}
-received_msg = []
-my_degree = 0
-my_id_info = id_config["MYID"]
-print("[GAPHINFO]")
-my_id = my_id_info["my_id"]
-print(f"{my_id=}")
-my_neighbors_info = id_config["NEIGHBORS"]
-my_neighbors = my_neighbors_info["neighbors"]
-print(f"{my_neighbors=}")
-my_neighbors = my_neighbors.split(',')
-for neighbor in my_neighbors:
-    neighborhood_ids[neighbor] = my_degree
-    received_msg.append(0)
-    my_neighbors_degree[neighbor] = -1
-    my_degree += 1
-received_msg_y = np.array(received_msg, dtype='int32')
-received_msg_d = np.array(received_msg, dtype='int32')
-my_degree = len(neighborhood_ids)
+    id_config = ConfigParser()
+    id_config.read("/persist/my_id.conf")
+    neighborhood_ids = {}
+    my_neighbors_degree = {}
+    received_msg = []
+    my_degree = 0
+    my_id_info = id_config["MYID"]
+    print("[GAPHINFO]")
+    my_id = my_id_info["my_id"]
+    print(f"{my_id=}")
+    my_neighbors_info = id_config["NEIGHBORS"]
+    my_neighbors = my_neighbors_info["neighbors"]
+    print(f"{my_neighbors=}")
+    my_neighbors = my_neighbors.split(',')
+    for neighbor in my_neighbors:
+        neighborhood_ids[neighbor] = my_degree
+        received_msg.append(0)
+        my_neighbors_degree[neighbor] = -1
+        my_degree += 1
+    received_msg_y = np.array(received_msg, dtype='int32')
+    received_msg_d = np.array(received_msg, dtype='int32')
+    my_degree = len(neighborhood_ids)
 
-#Read config file
-config_object = ConfigParser()
-config_object.read("/persist/param.conf")
+    #Read config file
+    config_object = ConfigParser()
+    config_object.read("/persist/param.conf")
 
-datainfo = config_object["DATAINFO"]
-print("[DATAINFO]")
+    datainfo = config_object["DATAINFO"]
+    print("[DATAINFO]")
 
-f = int(datainfo["f"])   # number of features
-dataset = datainfo["dataset"]
-print(f"{dataset=}")
-data_file = "/persist/"+dataset
-c = int(datainfo["c"])   # number of classes
-print(f"{c=}")
-algoinfo = config_object["ALGOCONFIG"]
-print("[ALGOCONFIG]")
-batch_size = int(algoinfo["batch_size"])
-print(f"{batch_size=}")
-sub_batch_size = int(algoinfo["sub_batch_size"])
-print(f"{sub_batch_size=}")
-L = int(algoinfo["l"])
-print(f"{L=}")
-T = int(algoinfo["t"])
-print(f"{T=}")
-num_nodes = int(algoinfo["num_nodes"])
-print(f"{num_nodes=}")
-r = float(algoinfo["r"])
-print(f"{r=}")
-eta = float(algoinfo["eta"])
-print(f"{eta=}")
-eta_exp = float(algoinfo["eta_exp"])
-print(f"{eta_exp=}")
-rho = float(algoinfo["rho"])
-print(f"{rho=}")
-rho_exp = float(algoinfo["rho_exp"])
-print(f"{rho_exp=}")
-reg = float(algoinfo["reg_coef"])
-print(f"{reg=}")
+    f = int(datainfo["f"])   # number of features
+    dataset = datainfo["dataset"]
+    print(f"{dataset=}")
+    data_file = "/persist/"+dataset
+    c = int(datainfo["c"])   # number of classes
+    print(f"{c=}")
+    algoinfo = config_object["ALGOCONFIG"]
+    print("[ALGOCONFIG]")
+    batch_size = int(algoinfo["batch_size"])
+    print(f"{batch_size=}")
+    sub_batch_size = int(algoinfo["sub_batch_size"])
+    print(f"{sub_batch_size=}")
+    L = int(algoinfo["l"])
+    print(f"{L=}")
+    T = int(algoinfo["t"])
+    print(f"{T=}")
+    num_nodes = int(algoinfo["num_nodes"])
+    print(f"{num_nodes=}")
+    r = float(algoinfo["r"])
+    print(f"{r=}")
+    eta = float(algoinfo["eta"])
+    print(f"{eta=}")
+    eta_exp = float(algoinfo["eta_exp"])
+    print(f"{eta_exp=}")
+    rho = float(algoinfo["rho"])
+    print(f"{rho=}")
+    rho_exp = float(algoinfo["rho_exp"])
+    print(f"{rho_exp=}")
+    reg = float(algoinfo["reg_coef"]) / np.sqrt(100)
+    print(f"{reg=}")
 
-dim = (f,c) # dimension of the output and messages
-shape = (f,c)
+    dim = (f,c) # dimension of the output and messages
+    shape = (f,c)
 
-x = np.ones(dim)
-y = np.zeros(dim)
-d = np.zeros(dim)
-g = np.zeros(dim)
-h = np.zeros(dim)
-v = np.zeros(dim)
-a = np.zeros(dim)
-weight = np.zeros(my_degree+1)
-o = [np.zeros(dim) for _ in range(L+1)]
-x_data = np.zeros([f,batch_size])
-y_data = np.zeros([batch_size])
-n = batch_size
-local_batch_size = int(batch_size/num_nodes)
-local_sub_batch_size = int(sub_batch_size/num_nodes)
-eta_l = 0
+    x = np.ones(dim)
+    y = np.zeros(dim)
+    d = np.zeros(dim)
+    g = np.zeros(dim)
+    h = np.zeros(dim)
+    v = np.zeros(dim)
+    a = np.zeros(dim)
+    weight = np.zeros(my_degree+1)
+    o = [np.zeros(dim) for _ in range(L+1)]
+    local_batch_size = int(batch_size/num_nodes)
+    local_sub_batch_size = int(sub_batch_size/num_nodes)
+    x_data = np.zeros([f,local_batch_size])
+    y_data = np.zeros([local_batch_size])
+    eta_l = 0
 
-neighborhood_y = []
-neighborhood_d = []
-
+    neighborhood_y = []
+    neighborhood_d = []
+except KeyboardInterrupt:
+    print(f"[INTERRUPTED]")
+    print(f"T = 0")
 
 
 def mux_degree(n_id, d):
@@ -307,6 +308,7 @@ def compute_exact_gradient(x):
     tmp_exp[y_data,range(data_size)] = tmp_exp[y_data,range(data_size)] - 1
     return (x_data / data_size) @ tmp_exp.T
 
+
 def compute_stoch_gradient(x,s=local_sub_batch_size):
     sub_batch = np.floor(np.random.rand(s)*local_batch_size).astype(int)
     x_stoch_data,y_stoch_data = x_data[:, sub_batch], y_data[sub_batch]
@@ -324,12 +326,14 @@ compute_gradient_fns[False] = compute_stoch_gradient
 
 compute_gradient = compute_gradient_fns[local_sub_batch_size == local_batch_size]
 
+
 def lmo(o):
     res = np.zeros(o.shape)
     max_rows = np.argmax(np.abs(o), axis=0)
     values = -r * np.sign(o[max_rows,range(o.shape[1])])
     res[max_rows, range(o.shape[1])] = values
     return res
+
 
 
 def degree_exchange():
@@ -360,7 +364,6 @@ def receive_batch_old(t):
 
 
 def noise(o):
-    global reg
     noise = -0.5 + np.random.rand(shape[0],shape[1])
     return reg * o + noise
 
@@ -383,54 +386,67 @@ def DMFW():
     time_of_result = 0
     overall_time = -time.time()
     for t in range(T):
-        
-        time_of_round -= time.time()
-        
-        x = np.zeros(shape)
-        xs[0] = np.zeros(shape)
-        for l in range(L):
+        try:
+            time_of_round -= time.time()
             
-            time_of_comm -= time.time()
-            send_message_to_neighbours(xs[l],'y_vector')
-            update_y()
-            time_of_comm += time.time()
+            x = np.zeros(shape)
+            xs[0] = np.zeros(shape)
+            for l in range(L):
+                
+                time_of_comm -= time.time()
+                send_message_to_neighbours(xs[l],'y_vector')
+                update_y()
+                time_of_comm += time.time()
 
-            time_of_iteration -= time.time()
-            eta_l = min(eta / pow(l+1, eta_exp), 1.0)
-            v = lmo(noise(o[l]))
-            xs[l+1] = y + eta_l * (v - y)
-            x = xs[l+1]
-            time_of_iteration += time.time()
+                time_of_iteration -= time.time()
+                
+                eta_l = min(eta / pow(l+1, eta_exp), 1.0)
+                v = lmo(noise(o[l]))
+                xs[l+1] = y + eta_l * (v - y)
+                x = xs[l+1]
+                time_of_iteration += time.time()
 
-        time_of_round += time.time()
-        
-        time_of_data -= time.time() 
-        x_data, y_data = receive_batch(t)
-        time_of_data += time.time()
+            time_of_round += time.time()
+            
+            time_of_data -= time.time() 
+            x_data, y_data = receive_batch(t)
+            time_of_data += time.time()
 
-        time_of_result -= time.time()
-        result.append(xs[L].reshape(f*c))
-        time_of_result += time.time()
+            time_of_result -= time.time()
+            result.append(xs[L].reshape(f*c))
+            time_of_result += time.time()
 
-        time_of_round -= time.time()
-        g = compute_gradient(xs[0])
-        h = g
-        for l in range(L):
-            time_of_comm -= time.time()
-            send_message_to_neighbours(g,'d_vector')
-            update_d()
-            time_of_comm += time.time()
+            time_of_round -= time.time()
+            g = compute_gradient(xs[0])
+            for l in range(L):
+                time_of_comm -= time.time()
+                send_message_to_neighbours(g,'d_vector')
+                update_d() 
+                time_of_comm += time.time()
 
-            time_of_iteration -= time.time()
-            rho_l = min(rho / pow(l+1,rho_exp), 1.0)
-            tmp = compute_gradient(xs[l+1])
-            g = (tmp - h) + d
-            h = tmp
-            a = (1-rho_l) * a + d
-            o[l+1] = o[l] + a
-            time_of_iteration += time.time()
+                time_of_iteration -= time.time()
+                rho_l = min(rho / pow(l+1,rho_exp), 1.0)
+                g = (compute_gradient(xs[l+1]) - compute_gradient(xs[l])) + d  
+                a = (1-rho_l) * a + rho_l * d
+                o[l] = o[l] + a
+                time_of_iteration += time.time()
 
-        time_of_round += time.time()
+            time_of_round += time.time()
+        except KeyboardInterrupt:
+            pd.DataFrame(result).to_csv("/persist/result.csv", index=False, header = False)
+            print(f"[INTERRUPTED]")
+            print(f"T = {t}")
+            print(f"[EXECTIME]")
+            print(f"{L=}")
+            print(f"{data_file=}")
+            print(f"{batch_size=}")
+            print(f"{num_nodes=}")
+            print(f"{time_of_round=}")
+            print(f"{time_of_data=}")
+            print(f"{time_of_comm=}")
+            print(f"{time_of_iteration=}")
+            print(f"{time_of_result=}")
+            print(f"{overall_time=}")   
     overall_time += time.time()
 
     time_of_round = time_of_round 

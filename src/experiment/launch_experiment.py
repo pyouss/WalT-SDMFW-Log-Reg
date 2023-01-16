@@ -27,6 +27,7 @@ def run_node(i):
         ).communicate()
     #print(f"{subprocess_result[1].decode()}")
     print(f"{node_name} done.")
+    return
 
 def launch_experiment():
     t = []

@@ -9,3 +9,5 @@ EXEC_DIR = f'{ROOT_DIR}/exec_time_logs'
 REGRET_DIR = f'{ROOT_DIR}/regrets'
 OUTPUTS_DIR = f'{ROOT_DIR}/outputs'
 GRAPH_DIR = f'{ROOT_DIR}/graphs'
+
+REMOTE_DIR =f'sdmfw'

@@ -3,37 +3,30 @@ import sys
 from configparser import ConfigParser
 import configparser as cp
 import subprocess
-from utils.routes import ROOT_DIR
+from utils.routes import ROOT_DIR,REMOTE_DIR
 from utils.configs_values import *
 from utils.files_path import *
+import utils.walt_handler as wh
+from utils.exit_handlers import *
 
 def get_result():
     
     node_result_path = "/persist/result.csv"
-    remote_result_path ="result/result.csv"
+    remote_result_path =f"{REMOTE_DIR}/result/result.csv"
     for i in range(len(working_nodes)):
         folder = result_path(i)
         if not os.path.exists(folder):
             os.makedirs(folder)
-        print(f"Transfering results from {working_nodes[i]} to walt server...")
-        cmd = f"walt node cp {working_nodes[i]}:{node_result_path} {remote_result_path}"
-        subprocess_result = subprocess.Popen(
-                f"ssh {user}@{server} {cmd}", 
-                shell=True, stdout=subprocess.PIPE, 
-                stderr=subprocess.PIPE
-                ).communicate()
-        #print(subprocess_result[0].decode())
-        #print(subprocess_result[1].decode())
-        print("Done.")
-        print()
-        print(f"Tranfering results from walt server to local machine ...")
-        cmd = f"scp {user}@{server}:{remote_result_path} {result_path(i)}"
-        subprocess_result = subprocess.Popen(
-                cmd, 
-                shell=True, stdout=subprocess.PIPE, 
-                stderr=subprocess.PIPE
-                ).communicate()
-        #print(subprocess_result[0].decode())
-        #print(subprocess_result[1].decode())
-        print("Done.")
-        print()
+        file_title = "results"
+        file_src = node_result_path
+        file_dest = remote_result_path
+        node_name = working_nodes[i]
+        wh.transefer_node_to_server(file_title,file_src,file_dest,node_name)
+        
+    
+        file_title = "results"
+        file_src = remote_result_path
+        file_dest = result_path(i)
+        wh.transfer_server_to_local(file_title,file_src,file_dest)
+        
+        print_end()

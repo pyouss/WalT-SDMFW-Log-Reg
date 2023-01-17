@@ -4,7 +4,7 @@ import sys
 import subprocess
 import docopt
 from config.config import modify_walt_user,modify_walt_server,update_configs
-from utils.routes import ROOT_DIR
+from utils.routes import ROOT_DIR,REMOTE_DIR
 from utils.configs_values import *
 import utils.walt_handler as wh
 from utils.exit_handlers import *
@@ -41,8 +41,9 @@ def init(args):
     wh.ssh_check()
     
     print_title("Create all the needed directories")
+    wh.walt_mkdir(f"{REMOTE_DIR}")
     for folder in folders:
-        wh.walt_mkdir(folder)
+        wh.walt_mkdir(f"{REMOTE_DIR}/{folder}")
         if not os.path.exists(f"{ROOT_DIR}/{folder}"):
             os.makedirs(folder)
     print_end()

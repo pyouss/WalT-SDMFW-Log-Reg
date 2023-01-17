@@ -26,8 +26,7 @@ import docopt
 import subprocess
 from utils.lock import lock_modifications,unlock_modifications,is_locked
 from utils.routes import SRC_DIR,ROOT_DIR
-from config.send_graph import send_graph
-from config.send_config import send_config
+from config.send_config import send_config,send_graph
 from utils.configs_values import *
 
 

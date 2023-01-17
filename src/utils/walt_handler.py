@@ -35,10 +35,10 @@ def subprocess_ssh_command(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE):
     return subprocess_result
 
 def scp_formating(host_name,file):
-    if machine_name == "" :
+    if host_name == "" :
         return f"{file}"
     else :
-        return f"{machine_name}:{file}"
+        return f"{host_name}:{file}"
 
 def subprocess_scp_command(src,dest,file_src,file_dest,stdout=subprocess.PIPE,stderr=subprocess.PIPE):
     if not is_remote :
@@ -69,7 +69,8 @@ def walt_image_clone(image_name,hub_name,force=False):
         
 
 def walt_node_run(title,node_name,cmd,stdout=subprocess.PIPE):
-    print_title(f"{title}")
+    if title != "":
+        print_title(f"{title}")
     run_cmd = f"walt node run {node_name} {cmd}"
     subprocess_result = subprocess_ssh_command(run_cmd,stdout=stdout)
     return subprocess_result

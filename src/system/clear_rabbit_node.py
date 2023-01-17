@@ -5,25 +5,16 @@ import sys
 import subprocess
 from utils.routes import ROOT_DIR
 from utils.configs_values import *
+import utils.walt_handler as wh
+from utils.exit_handlers import *
 
 def clear_rabbit_node():
 
-    print(f"Clearing queues on rabbit_node")
-    cmd = f"walt node run {center_node} python3 delete.py"
-    subprocess_result = subprocess.Popen(
-        f"echo y | ssh {user}@{server} {cmd}", 
-        shell=True, stdout=subprocess.PIPE, 
-        stderr=subprocess.PIPE
-        ).communicate()
-    print(f"{subprocess_result[0].decode()}")
-    print(f"{subprocess_result[1].decode()}")
+    title = f"Clearing queues on rabbit_node"
+    cmd = "python3 delete.py"
+    wh.walt_node_run(title,center_node,cmd)
 
-    cmd = f"walt node run {center_node} python3 declare.py"
-    subprocess_result = subprocess.Popen(
-        f"echo y | ssh {user}@{server} {cmd}", 
-        shell=True, stdout=subprocess.PIPE, 
-        stderr=subprocess.PIPE
-        ).communicate()
-    #print(f"{subprocess_result[0].decode()}")
-    #print(f"{subprocess_result[1].decode()}")
-    print("Done.")
+    cmd = "python3 declare.py"
+    wh.walt_node_run("",center_node,cmd)
+    
+    print_end()

@@ -53,6 +53,7 @@ try:
     print("[DATAINFO]")
 
     f = int(datainfo["f"])   # number of features
+    print(f"{f=}")
     dataset = datainfo["dataset"]
     print(f"{dataset=}")
     data_file = "/persist/"+dataset

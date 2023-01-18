@@ -14,10 +14,10 @@ The experiment command is used to run the experiments after the environment has 
 
 In summary, this project uses the SDMFW algorithm to optimize multiclass logistic regression in a decentralized manner using the MNIST and CIFAR10 datasets on a cluster of Raspberry Pi devices. The project is deployed on the WalT platform and provides scripts for parametrizing, launching, and receiving results from the experiment, as well as computing the regret analysis.
 
-#Usage
+# Usage
 The tools can be run using the following commands:
 
-##sys
+## ./sys
 - `./sys init` - Initializes the system
 - `./sys init clone force` - Initializes the system with a force clone
 - `./sys init <username> <servername>` - Initializes the system with a specific username and servername
@@ -30,4 +30,45 @@ The tools can be run using the following commands:
 - `./sys download [mnist | cifar10]` - Downloads the specified dataset
 - `./sys load [mnist | cifar10]` - Loads the specified dataset
 - `./sys -h or ./sys --help` - Show the help message and exit
+### Options 
+
+- `-t`, `--test` - Test if the connection is established by sending pings
+- `--no_connect` - Only test and do not try to connect nodes to the router
+- `ap` - Starts the hostapd and rabbitmq services
+
+This tool is used to configure the experiment parameters and it's environment, please make sure you have access to your walt platform before running the commands.
+
+Note: The dataset options available are mnist and cifar10, you can download and load the specific dataset.
+
+## ./configure
+
+- `./configure [options]` - Runs the configuration with specified options
+- `./configure graph grid <height> <width>` - Creates a grid graph with specified height and width
+- `./configure graph <graph_type> <size>` - Creates a graph of specified type and size
+- `./configure mnist` - Configures the system to use the MNIST dataset
+- `./configure cifar10` - Configures the system to use the CIFAR-10 dataset
+- `./configure localhost` - Configures the system to use the localhost
+- `./configure user <user> server <server>` - Configures the system to use a specific user and server
+- `./configure add <node_name>` - Adds a node to the system
+- `./configure sync` - Synchronizes the system
+- `./configure unlock` - Unlocks the system
+- `./configure show` - Shows the current configuration
+- `./configure -h or ./configure --help` - Show the help message and exit
+
+### Options
+- `-l L` - Specify the number of iterations in an online round
+- `-t T` - Specify the number of online rounds
+- `--batch_size BATCH_SIZE` - Specify the batch size
+- `--sub_batch_size SUB_BATCH_SIZE` - Specify the sub-batch size
+
+This tool is used to configure the experiment parameters and it's environment, please make sure you have access to your walt platform before running the commands.
+
+The graph command is used to create a graph with the specified options, mnist and cifar10 commands are used to configure the system to use the specified datasets.
+
+## ./experiment
+Once experiment's environment is set and chose the desired configurations. Launch the experiment with the following command :
+
+```bash
+./experiment launch [options]
+```
 

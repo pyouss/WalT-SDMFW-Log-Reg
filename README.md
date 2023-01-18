@@ -50,7 +50,7 @@ Note: The dataset options available are mnist and cifar10, you can download and 
 - `./configure localhost` - Configures the system to use the localhost
 - `./configure user <user> server <server>` - Configures the system to use a specific user and server
 - `./configure add <node_name>` - Adds a node to the system
-- `./configure sync` - Synchronizes the system
+- `./configure sync` - Synchronizes the configurations with all the nodes.
 - `./configure unlock` - Unlocks the system
 - `./configure show` - Shows the current configuration
 - `./configure -h or ./configure --help` - Show the help message and exit
@@ -72,3 +72,10 @@ Once experiment's environment is set and chose the desired configurations. Launc
 ./experiment launch [options]
 ```
 
+If you haven't synchronized the configurations with the nodes then this command will be blocked.
+
+### Options
+You can store an analysis of different time benchmarks using the option `--time` : 
+```bash
+./experiment launch --time
+```
